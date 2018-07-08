@@ -1,6 +1,3 @@
-FROM ubuntu:16.04
+FROM daocloud.io/node:8.11.3-onbuild
 
-MAINTAINER nicekingwei nicekingwei@foxmail.com
-
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
-RUN apt install -y nodejs npm
+LABEL maintainer="nicekingwei@foxmail.com"
