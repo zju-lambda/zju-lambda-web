@@ -1,41 +1,57 @@
 var https = require('https');
-
-// var http = require('http');
-// http.createServer(function (req, res) {
-
-//   res.write('Hello World!'); // write a response to the client
-//   res.end(); // end the response
-// }).listen(3141); // the server object listens on port 3141 
+var http = require('http');
 
 var token = 'ab4ee798-9a1a-4f86-993e-20c81cfd5857';
 
-var options = {
-    hostname: 'run.glot.io',
-    path: '/languages/python/latest',
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Token ' + token
-    }
-};
+var glot_langs = ['c','cpp','python','haskell','rust','scala','javascript','lua','idris','java'];
+var glot_ext = ['.c','cpp','.py','.hs','.rst','.scala','.js','.lua','.idr','.java'];
 
-var data = {
-    "files": [
-        {
-            "name": "main.py",
-            "content": "print(42)"
+function runcode(lang, content,callback) {
+  var use_glot = false;
+  for(var i in glot_langs){
+    if(lang==glot_langs[i]){
+      use_glot = true;
+      var options = {
+        hostname: 'run.glot.io',
+        path: '/languages/'+lang+'/latest',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token ' + token
         }
-    ]
-};
+      };
+    
+      var data = {'files': [{'name': 'main' + glot_ext[i], 'content': content}]};
 
-var req = https.request(options, function (res) {
-    var status = res.statusCode;
-    res.setEncoding('utf8');
-    res.on('data', (chunk) => {
-        console.log(chunk);
-    });
-});
+      var req = https.request(options, function(res) {
+        var status = res.statusCode;
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => {
+          var data = JSON.parse(chunk);
+          if(data.stdout){
+            callback(data.stdout);
+          }else if(data.stderr){
+            callback(data.stderr);
+          }else{
+            callback(data.error);
+          }
+        });
+      });
+    
+      req.write(JSON.stringify(data));
+      req.end();
+      break;
+    }
+  }
 
-req.write(JSON.stringify(data));
+  if(!use_glot){
+    callback();
+  }
+}
 
-req.end();
+http.createServer(function (req, res) {
+  res.write('Hello World!');
+  res.end();
+}).listen(4368); 
+
+runcode('python','print(42)',console.log);
