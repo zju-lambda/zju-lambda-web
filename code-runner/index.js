@@ -4,8 +4,7 @@ const fs = require('fs');
 const cp = require('child_process');
 
 
-var docker_count = 0;
-var docker_m
+
 /*
  * code runner
  */
@@ -59,10 +58,25 @@ var my_langs = {
 };
 
 
+var docker_count = 0;
+var docker_max = 10;
+var docker_garbages = [];
+function docker_remove(name){
+  docker_count += 1;
+  docker_garbages += name;
+  if(docker_count>docker_max){
+    docker_count = 0;
+    var cmd = 'docker rm ' + docker_garbages.join(' ');
+    docker_garbages = [];
+    cp.exec(cmd);
+  }
+}
+
 function runcode(lang, content, callback) {
   // glot runner
   var lang_setting = glot_langs[lang];
   content = new Buffer(content, 'base64').toString('utf-8');
+  console.log('['+lang+'] '+content.split('\n').slice(0,3).join(' '));
 
   if (lang_setting) {
     var options = {
@@ -115,6 +129,7 @@ function runcode(lang, content, callback) {
           callback(err);
         }
         cp.exec('rm -rf ' + rand);
+        docker_remove(rand);
       });
     } else {
       callback();
@@ -135,6 +150,7 @@ function server(req, res) {
       runcode(data.lang, data.code, function(result) {
         if (result) {
           result = result.replace('\n','<br></br>');
+          console.log("[result] "+result);
           res.write(result);
         } else {
           res.writeHead(403);
