@@ -5,10 +5,7 @@ services:
 
 script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  # - mv ./travis.Dockerfile Dockerfile
-  # - docker build . -t nicekingwei/zju-lambda-web:travis
-  # - docker push nicekingwei/zju-lambda-web
-  - mv code-runner/steak.Dockerfile Dockerfile
-  - docker build . -t nicekingwei/zju-lambda-web:steak
+  - mv ./travis.Dockerfile Dockerfile
+  - docker build . -t nicekingwei/zju-lambda-web:travis
   - docker push nicekingwei/zju-lambda-web
   
