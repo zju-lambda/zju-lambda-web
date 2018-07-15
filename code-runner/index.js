@@ -3,6 +3,9 @@ const http = require('http');
 const fs = require('fs');
 const cp = require('child_process');
 
+
+var docker_count = 0;
+var docker_m
 /*
  * code runner
  */
@@ -26,23 +29,30 @@ var my_langs = {
     ext: '.stk.cpp',
     docker: 'nicekingwei/steak',
     cmd: function() {
-      return 'steak . && g++ -std=c++17 main.cpp && ./a.out';
+      return 'steak . && g++ -std=c++17 ./main.cpp && ./a.out';
     }
   },
   'coq': {
     ext: '.v',
     docker: 'skippa/coq',
-    cmd: function(filename) {
+    cmd: function() {
       return 'coqc main.v';
+    }
+  },
+  'racket': {
+    ext: '.rt',
+    docker: 'jackfirth/racket',
+    cmd: function() {
+      return 'racket main.rt';
     }
   },
   'agda': {
     ext: '.agda',
     docker: 'banacorn/agda',
-    cmd: function(filename) {
+    cmd: function() {
       var head = 'module main where\n';
       var main_code = fs.readFileSync(filename, 'utf8');
-      fs.writeFileSync(filename, head + main_code);
+      fs.writeFileSync(filename, head + main_code, {encoding: 'utf-8'});
       return 'agda main.agda';
     }
   }
@@ -52,6 +62,7 @@ var my_langs = {
 function runcode(lang, content, callback) {
   // glot runner
   var lang_setting = glot_langs[lang];
+  content = new Buffer(content, 'base64').toString('utf-8');
 
   if (lang_setting) {
     var options = {
@@ -86,14 +97,14 @@ function runcode(lang, content, callback) {
   } else {
     lang_setting = my_langs[lang];
     if (lang_setting) {
-      var rand = Math.floor(Math.random() * 1e9).toString();
-      cp.execSync('mkdir -p ' + rand);
-      var filename = rand + '/main' + lang_setting.ext;
-      fs.writeFileSync(filename, content);
+      var rand = Math.abs(Math.floor(Math.random() * 1e9)).toString();
+      cp.execSync('mkdir -p /home/ubuntu/code/' + rand);
+      var filename = '/home/ubuntu/code/' + rand + '/main' + lang_setting.ext;
+      fs.writeFileSync(filename, content, {encoding: 'utf-8'});
 
       var cmd = 'docker run -v /home/ubuntu/code/' + rand +
-          ':/tmp/code -w /tmp/code ' + lang_setting.docker + ' ' +
-          lang_setting.cmd();
+          ':/tmp/code -w /tmp/code ' + lang_setting.docker + ' /bin/bash -c "' +
+          lang_setting.cmd() + '"';
 
       cp.exec(cmd, function(err, stdout, stderr) {
         if (stdout) {
@@ -103,6 +114,7 @@ function runcode(lang, content, callback) {
         } else {
           callback(err);
         }
+        cp.exec('rm -rf ' + rand);
       });
     } else {
       callback();
@@ -121,10 +133,18 @@ function server(req, res) {
       var data = JSON.parse(body);
       res.writeHead(201, {'Content-Type': 'text/html'});
       runcode(data.lang, data.code, function(result) {
-        res.write(result);
+        if (result) {
+          result = result.replace('\n','<br></br>');
+          res.write(result);
+        } else {
+          res.writeHead(403);
+        }
         res.end();
       });
     });
+  } else {
+    res.writeHead(404);
+    res.end();
   }
 }
 http.createServer(server).listen(4368);
