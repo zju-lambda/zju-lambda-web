@@ -12,7 +12,6 @@ var token = 'ab4ee798-9a1a-4f86-993e-20c81cfd5857';
 
 var glot_langs = {
   'c': '.c',
-  'cpp': '.cpp',
   'python': '.py',
   'haskell': '.hs',
   'rust': '.rst',
@@ -29,6 +28,13 @@ var my_langs = {
     docker: 'nicekingwei/steak',
     cmd: function() {
       return 'steak . && g++ -std=c++17 ./main.cpp && ./a.out';
+    }
+  },
+  'cpp':{
+    ext: '.cpp',
+    docker: 'nicekingwei/steak',
+    cmd: function() {
+      return 'g++ -std=c++17 ./main.cpp && ./a.out';
     }
   },
   'coq': {
