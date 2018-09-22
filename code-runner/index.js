@@ -155,7 +155,11 @@ function server(req, res) {
       res.writeHead(201, {'Content-Type': 'text/html'});
       runcode(data.lang, data.code, function(result) {
         if (result) {
-          result = result.replace('\n','<br></br>');
+          var nr = result.replace('\n','<br>');
+          while(nr!=result){
+            result = nr;
+            nr = result.replace('\n','<br>');
+          }
           console.log("[result] "+result);
           res.write(result);
         } else {
