@@ -69,7 +69,7 @@ var docker_max = 10;
 var docker_garbages = [];
 function docker_remove(name){
   docker_count += 1;
-  docker_garbages += name;
+  docker_garbages.push(name);
   if(docker_count>docker_max){
     docker_count = 0;
     var cmd = 'docker rm ' + docker_garbages.join(' ');
