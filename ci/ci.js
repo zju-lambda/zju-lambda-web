@@ -13,6 +13,7 @@ function server(req, res) {
       if (data.repository && data.repository.name &&
           data.repository.name == 'arcdb') {
         var cmds = [
+          'rm -rf engine arcdb',
           'git clone git@git.dev.tencent.com:Nicekingwei/arcdb.git',
           'git clone git@code.aliyun.com:nicekingwei/engine.git',
           'rm -rf engine/engine_race/*.h',
