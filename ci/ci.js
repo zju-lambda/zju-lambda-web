@@ -10,6 +10,7 @@ function server(req, res) {
     });
     req.on('end', function() {
       var data = JSON.parse(body);
+      console.log(data);
       if (data.repository && data.repository.name &&
           data.repository.name == 'arcdb') {
         var cmds = [
@@ -27,7 +28,6 @@ function server(req, res) {
           'rm -rf engine arcdb'
         ];
         var cmd = cmds.join(' && ');
-        console.log(cmd);
         cp.execSync(cmd);
       }
       res.writeHead(200);
