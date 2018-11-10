@@ -10,24 +10,28 @@ function server(req, res) {
     });
     req.on('end', function() {
       var data = JSON.parse(body);
-      console.log(data);
+      var msg = data.head_commit.message.trim()
+      var branch = [];
+      var s = msg.split(' ')
+      if (s.length == 2 && s[0] == 'branch') {
+        branch = ['cd arcdb', 'git checkout ' + s[1], 'cd ../'];
+      }
       if (data.repository && data.repository.name &&
           data.repository.name == 'arcdb') {
-        var cmds = [
-          'rm -rf engine arcdb',
-          'git clone git@git.dev.tencent.com:Nicekingwei/arcdb.git',
-          'git clone git@code.aliyun.com:nicekingwei/engine.git',
-          'rm -rf engine/engine_race/*.h',
-          'rm -rf engine/engine_race/*.cc',
-          'cp -r arcdb/engine_race/include/* engine/engine_race',
-          'cp -r arcdb/engine_race/src/* engine/engine_race',
-          'cd engine',
-          'git add .',
-          'git commit -m "forward"',
-          'git push',
-          'cd ../',
-          'rm -rf engine arcdb'
-        ];
+        var cmds =
+            [
+              'rm -rf engine arcdb',
+              'git clone git@git.dev.tencent.com:Nicekingwei/arcdb.git'
+            ].concat(branch)
+                .concat([
+                  'git clone git@code.aliyun.com:nicekingwei/engine.git',
+                  'rm -rf engine/engine_race/*.h',
+                  'rm -rf engine/engine_race/*.cc',
+                  'cp -r arcdb/engine_race/include/* engine/engine_race',
+                  'cp -r arcdb/engine_race/src/* engine/engine_race',
+                  'cd engine', 'git add .', 'git commit -m "forward"',
+                  'git push', 'cd ../', 'rm -rf engine arcdb'
+                ]);
         var cmd = cmds.join(' && ');
         cp.execSync(cmd);
       }
