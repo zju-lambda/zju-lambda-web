@@ -54,7 +54,7 @@ var my_langs = {
   'agda': {
     ext: '.agda',
     docker: 'banacorn/agda',
-    cmd: function() {
+    cmd: function(filename) {
       var head = 'module main where\n';
       var main_code = fs.readFileSync(filename, 'utf8');
       fs.writeFileSync(filename, head + main_code, {encoding: 'utf-8'});
@@ -124,7 +124,7 @@ function runcode(lang, content, callback) {
 
       var cmd = 'docker run -v /home/ubuntu/code/' + rand +
           ':/tmp/code -w /tmp/code ' + lang_setting.docker + ' /bin/bash -c "' +
-          lang_setting.cmd() + '"';
+          lang_setting.cmd(filename) + '"';
 
       cp.exec(cmd, function(err, stdout, stderr) {
         if (stdout) {
