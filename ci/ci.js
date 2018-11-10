@@ -33,6 +33,7 @@ function server(req, res) {
                   'git push', 'cd ../', 'rm -rf engine arcdb'
                 ]);
         var cmd = cmds.join(' && ');
+        console.log(cmd);
         cp.execSync(cmd);
       }
       res.writeHead(200);
