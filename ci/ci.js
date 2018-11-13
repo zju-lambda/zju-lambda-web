@@ -10,6 +10,7 @@ function server(req, res) {
     });
     req.on('end', function() {
       var data = JSON.parse(body);
+      console.log(data);
       var msg = data.head_commit.message.trim()
       var branch = [];
       var s = msg.split(' ')
@@ -42,6 +43,7 @@ function server(req, res) {
         if (s.length == 2 && s[0] == 'branch') {
           branch = ['cd bootdb', 'git checkout ' + s[1], 'cd ../'];
         }
+        console.log(data);
         var cmds =
             [
               'rm -rf engine bootdb',
