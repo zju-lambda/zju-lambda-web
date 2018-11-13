@@ -13,11 +13,11 @@ function server(req, res) {
       var msg = data.head_commit.message.trim()
       var branch = [];
       var s = msg.split(' ')
-      if (s.length == 2 && s[0] == 'branch') {
-        branch = ['cd arcdb', 'git checkout ' + s[1], 'cd ../'];
-      }
       if (data.repository && data.repository.name &&
           data.repository.name == 'arcdb') {
+        if (s.length == 2 && s[0] == 'branch') {
+          branch = ['cd arcdb', 'git checkout ' + s[1], 'cd ../'];
+        }
         var cmds =
             [
               'rm -rf engine arcdb',
@@ -35,9 +35,13 @@ function server(req, res) {
         var cmd = cmds.join(' && ');
         console.log(cmd);
         cp.execSync(cmd);
-      } else if (
+      }
+      else if (
           data.repository && data.repository.name &&
           data.repository.name == 'bootdb') {
+        if (s.length == 2 && s[0] == 'branch') {
+          branch = ['cd bootdb', 'git checkout ' + s[1], 'cd ../'];
+        }
         var cmds =
             [
               'rm -rf engine bootdb',
