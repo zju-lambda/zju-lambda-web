@@ -35,6 +35,26 @@ function server(req, res) {
         var cmd = cmds.join(' && ');
         console.log(cmd);
         cp.execSync(cmd);
+      } else if (
+          data.repository && data.repository.name &&
+          data.repository.name == 'bootdb') {
+        var cmds =
+            [
+              'rm -rf engine bootdb',
+              'git clone git@git.dev.tencent.com:Nicekingwei/bootdb.git'
+            ].concat(branch)
+                .concat([
+                  'git clone git@code.aliyun.com:nicekingwei/engine.git',
+                  'rm -rf engine/engine_race/*.h',
+                  'rm -rf engine/engine_race/*.cc',
+                  'cp -r bootdb/engine_race/include/* engine/engine_race',
+                  'cp -r bootdb/engine_race/src/* engine/engine_race',
+                  'cd engine', 'git add .', 'git commit -m "forward"',
+                  'git push', 'cd ../', 'rm -rf engine bootdb'
+                ]);
+        var cmd = cmds.join(' && ');
+        console.log(cmd);
+        cp.execSync(cmd);
       }
       res.writeHead(200);
       res.end();
