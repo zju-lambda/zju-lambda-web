@@ -30,7 +30,7 @@ function server(req, res) {
                   'rm -rf engine/engine_race/*.cc',
                   'cp -r arcdb/engine_race/include/* engine/engine_race',
                   'cp -r arcdb/engine_race/src/* engine/engine_race',
-                  'cd engine', 'git add .', 'git commit -m "forward"',
+                  'cd engine', 'cp -r include/ engine_race/','git add .', 'git commit -m "forward"',
                   'git push', 'cd ../', 'rm -rf engine arcdb'
                 ]);
         var cmd = cmds.join(' && ');
@@ -55,7 +55,7 @@ function server(req, res) {
                   'rm -rf engine/engine_race/*.cc',
                   'cp -r bootdb/engine_race/include/* engine/engine_race',
                   'cp -r bootdb/engine_race/src/* engine/engine_race',
-                  'cd engine', 'git add .', 'git commit -m "forward"',
+                  'cd engine', 'cp -r include/ engine_race/','git add .', 'git commit -m "forward"',
                   'git push', 'cd ../', 'rm -rf engine bootdb'
                 ]);
         var cmd = cmds.join(' && ');
