@@ -11,11 +11,10 @@ function server(req, res) {
     req.on('end', function() {
       var data = JSON.parse(body);
       console.log(data);
-      var msg = data == null || data.head_commit == null ||
-          data.head_commit.message == null || data.head_commit.message.trim()
-      if (msg == true) msg = 'forward';
-
-      var msg = data.head_commit.message.trim()
+      var msg = 'forward';
+      if (data && data.head_commit && data.head_commit.message) {
+        msg = data.head_commit.message.trim();
+      }
       var branch = [];
       var s = msg.split(' ')
       if (data.repository && data.repository.name &&
@@ -35,12 +34,12 @@ function server(req, res) {
                   'cp -r arcdb/engine_race/include/* engine/engine_race',
                   'cp -r arcdb/engine_race/src/* engine/engine_race',
                   'cd engine', 'cp -r include/ engine_race/', 'git add .',
-                  'git commit -m "', msg, '"', 'git push', 'cd ../',
+                  'git commit -m "' + msg + '"', 'git push', 'cd ../',
                   'rm -rf engine arcdb'
                 ]);
         var cmd = cmds.join(' && ');
         console.log(cmd);
-        cp.execSync(cmd);
+        cp.exec(cmd,console.log);
       }
       else if (
           data.repository && data.repository.name &&
@@ -61,12 +60,12 @@ function server(req, res) {
                   'cp -r bootdb/engine_race/include/* engine/engine_race',
                   'cp -r bootdb/engine_race/src/* engine/engine_race',
                   'cd engine', 'cp -r include/ engine_race/', 'git add .',
-                  'git commit -m "', msg, '"', 'git push', 'cd ../',
+                  'git commit -m "' + msg + '"', 'git push', 'cd ../',
                   'rm -rf engine bootdb'
                 ]);
         var cmd = cmds.join(' && ');
         console.log(cmd);
-        cp.execSync(cmd);
+        cp.exec(cmd,console.log);
       }
       res.writeHead(200);
       res.end();
