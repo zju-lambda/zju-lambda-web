@@ -11,6 +11,10 @@ function server(req, res) {
     req.on('end', function() {
       var data = JSON.parse(body);
       console.log(data);
+      var msg = data == null || data.head_commit == null ||
+          data.commit.message == null || data.head_commit.message.trim()
+      if (msg == true) msg = 'forward';
+
       var msg = data.head_commit.message.trim()
       var branch = [];
       var s = msg.split(' ')
@@ -30,7 +34,7 @@ function server(req, res) {
                   'rm -rf engine/engine_race/*.cc',
                   'cp -r arcdb/engine_race/include/* engine/engine_race',
                   'cp -r arcdb/engine_race/src/* engine/engine_race',
-                  'cd engine', 'git add .', 'git commit -m "forward"',
+                  'cd engine', 'git add .', 'git commit -m "', msg, '"',
                   'git push', 'cd ../', 'rm -rf engine arcdb'
                 ]);
         var cmd = cmds.join(' && ');
@@ -55,7 +59,7 @@ function server(req, res) {
                   'rm -rf engine/engine_race/*.cc',
                   'cp -r bootdb/engine_race/include/* engine/engine_race',
                   'cp -r bootdb/engine_race/src/* engine/engine_race',
-                  'cd engine', 'git add .', 'git commit -m "forward"',
+                  'cd engine', 'git add .', 'git commit -m "', msg, '"',
                   'git push', 'cd ../', 'rm -rf engine bootdb'
                 ]);
         var cmd = cmds.join(' && ');
