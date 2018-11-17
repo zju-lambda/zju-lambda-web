@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const cp = require('child_process');
 
@@ -39,7 +40,7 @@ function server(req, res) {
                 ]);
         var cmd = cmds.join(' && ');
         console.log(cmd);
-        cp.exec(cmd,console.log);
+        cp.exec(cmd, console.log);
       }
       else if (
           data.repository && data.repository.name &&
@@ -65,7 +66,17 @@ function server(req, res) {
                 ]);
         var cmd = cmds.join(' && ');
         console.log(cmd);
-        cp.exec(cmd,console.log);
+        cp.exec(cmd, console.log);
+        var options = {
+          hostname: 'oapi.dingtalk.com',
+          port: 443,
+          path:
+              '/robot/send?access_token=150fad29d24a78689a26610b3c824c2c30e8fff8aa9677a8d9a77bcf8b3f92d4',
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          data: {'msgtype': 'text', 'text': {'content': msg}}
+        };
+        https.request(options);
       }
       res.writeHead(200);
       res.end();
