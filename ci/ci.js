@@ -84,7 +84,7 @@ function server(req, res) {
           };
           var postData = {
             'msgtype': 'text',
-            'text': {'content': who + ':' + msg}
+            'text': {'content': committer + ':' + msg}
           };
           var req = https.request(options);
           req.write(JSON.stringify(postData));
