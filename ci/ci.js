@@ -74,9 +74,11 @@ function server(req, res) {
               '/robot/send?access_token=150fad29d24a78689a26610b3c824c2c30e8fff8aa9677a8d9a77bcf8b3f92d4',
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          data: {'msgtype': 'text', 'text': {'content': msg}}
         };
-        https.request(options);
+        var postData = {'msgtype': 'text', 'text': {'content': msg}}
+        var req = https.request(options);
+        req.write(JSON.stringify(postData));
+        req.end();
       }
       res.writeHead(200);
       res.end();
