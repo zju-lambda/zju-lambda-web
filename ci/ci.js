@@ -12,7 +12,7 @@ function server(req, res) {
       var data = JSON.parse(body);
       console.log(data);
       var msg = data == null || data.head_commit == null ||
-          data.commit.message == null || data.head_commit.message.trim()
+          data.head_commit.message == null || data.head_commit.message.trim()
       if (msg == true) msg = 'forward';
 
       var msg = data.head_commit.message.trim()
