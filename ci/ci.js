@@ -48,6 +48,10 @@ function server(req, res) {
         if (s.length == 2 && s[0] == 'branch') {
           branch = ['cd bootdb', 'git checkout ' + s[1], 'cd ../'];
         }
+        var committer = 'who';
+        if (data && data.head_commit && data.head_commit.committer) {
+          committer = data.head_commit.committer.name;
+        }
         console.log(data);
         var cmds =
             [
@@ -66,19 +70,26 @@ function server(req, res) {
                 ]);
         var cmd = cmds.join(' && ');
         console.log(cmd);
-        cp.exec(cmd, console.log);
-        var options = {
-          hostname: 'oapi.dingtalk.com',
-          port: 443,
-          path:
-              '/robot/send?access_token=150fad29d24a78689a26610b3c824c2c30e8fff8aa9677a8d9a77bcf8b3f92d4',
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-        };
-        var postData = {'msgtype': 'text', 'text': {'content': msg}}
-        var req = https.request(options);
-        req.write(JSON.stringify(postData));
-        req.end();
+        cp.exec(cmd, function(err) {
+          if (err) {
+            console.log(err);
+          }
+          var options = {
+            hostname: 'oapi.dingtalk.com',
+            port: 443,
+            path:
+                '/robot/send?access_token=150fad29d24a78689a26610b3c824c2c30e8fff8aa9677a8d9a77bcf8b3f92d4',
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+          };
+          var postData = {
+            'msgtype': 'text',
+            'text': {'content': who + ':' + msg}
+          };
+          var req = https.request(options);
+          req.write(JSON.stringify(postData));
+          req.end();
+        });
       }
       res.writeHead(200);
       res.end();
